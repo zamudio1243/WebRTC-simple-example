@@ -18,7 +18,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-const firestore = firestore.firestore();
+const firestore = firebase.firestore();
 
 
 const servers = {
