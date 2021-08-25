@@ -18,6 +18,8 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
+const firestore = firestore.firestore();
+
 
 const servers = {
   iceServers: [
@@ -31,7 +33,7 @@ const servers = {
 // Glonal State
 let pc = new RTCPeerConnection(servers);
 let localStream = null; // Your webcam
-let remoteSteam = null; // Your friend webcam
+let remoteStream = null; // Your friend webcam
 
 //HTML elements
 const webcamButton = document.getElementById('webcamButton');
@@ -48,7 +50,7 @@ const hangupButton = document.getElementById('hangupButton');
 webcamButton.onclick = async () => {
   // Solicitara inicar la camara en el navegador
   // Creando nuestro stream de datos de camara y audio
-  localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
 
   // Ininicalización del stream a recibir, en este momento es vacio
