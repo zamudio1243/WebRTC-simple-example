@@ -1,9 +1,8 @@
-import './style.css'
+import './style.css';
 
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyC6gxhINyjRetBOkPsTwuF1Jcm7veQJ02Y",
   authDomain: "pair-programming-7ea55.firebaseapp.com",
@@ -14,12 +13,11 @@ const firebaseConfig = {
   measurementId: "G-V7ZRHWMHPP"
 };
 
+
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-
 const firestore = firebase.firestore();
-
 
 const servers = {
   iceServers: [
@@ -30,12 +28,12 @@ const servers = {
   iceCandidatePoolSize: 10,
 };
 
-// Glonal State
-let pc = new RTCPeerConnection(servers);
-let localStream = null; // Your webcam
-let remoteStream = null; // Your friend webcam
+// Global State
+const pc = new RTCPeerConnection(servers);
+let localStream = null;
+let remoteStream = null;
 
-//HTML elements
+// HTML elements
 const webcamButton = document.getElementById('webcamButton');
 const webcamVideo = document.getElementById('webcamVideo');
 const callButton = document.getElementById('callButton');
@@ -44,34 +42,24 @@ const answerButton = document.getElementById('answerButton');
 const remoteVideo = document.getElementById('remoteVideo');
 const hangupButton = document.getElementById('hangupButton');
 
-// 1.Stepup media sources
-
+// 1. Setup media sources
 
 webcamButton.onclick = async () => {
-  // Solicitara inicar la camara en el navegador
-  // Creando nuestro stream de datos de camara y audio
   localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-
-  // Ininicalización del stream a recibir, en este momento es vacio
   remoteStream = new MediaStream();
 
   // Push tracks from local stream to peer connection
-  // Push audio/video to the peer connection (pc: RTCPeerConnection)
   localStream.getTracks().forEach((track) => {
     pc.addTrack(track, localStream);
   });
 
   // Pull tracks from remote stream, add to video stream
-  // Pull audio/video to the peer connection (pc: RTCPeerConnection)
   pc.ontrack = (event) => {
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track);
     });
   };
 
-
-  // Asignacion de los streams a su componente correspondiente
   webcamVideo.srcObject = localStream;
   remoteVideo.srcObject = remoteStream;
 
@@ -90,8 +78,6 @@ callButton.onclick = async () => {
   callInput.value = callDoc.id;
 
   // Get candidates for caller, save to db
-  // Listener for candidates
-  // Setup listener before setLocalDescription
   pc.onicecandidate = (event) => {
     event.candidate && offerCandidates.add(event.candidate.toJSON());
   };
@@ -100,14 +86,11 @@ callButton.onclick = async () => {
   const offerDescription = await pc.createOffer();
   await pc.setLocalDescription(offerDescription);
 
-  //Protocolo de la oferta
   const offer = {
-    sdp: offerDescription.sdp, //Session descripcion
+    sdp: offerDescription.sdp,
     type: offerDescription.type,
   };
 
-
-  //Se coloca la oferta
   await callDoc.set({ offer });
 
   // Listen for remote answer
@@ -135,7 +118,7 @@ callButton.onclick = async () => {
 // 3. Answer the call with the unique ID
 answerButton.onclick = async () => {
   const callId = callInput.value;
-  const callDoc = firestore.collection('calls').doc(callId); // Hace match con la OFERTA
+  const callDoc = firestore.collection('calls').doc(callId);
   const answerCandidates = callDoc.collection('answerCandidates');
   const offerCandidates = callDoc.collection('offerCandidates');
 
