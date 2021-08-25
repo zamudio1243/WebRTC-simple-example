@@ -13,7 +13,6 @@ const firebaseConfig = {
   measurementId: "G-V7ZRHWMHPP"
 };
 
-
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -45,7 +44,11 @@ const hangupButton = document.getElementById('hangupButton');
 // 1. Setup media sources
 
 webcamButton.onclick = async () => {
-  localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: true})
+  .catch((e) => {
+    console.table(e)
+
+  });
   remoteStream = new MediaStream();
 
   // Push tracks from local stream to peer connection
