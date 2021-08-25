@@ -44,7 +44,7 @@ const hangupButton = document.getElementById('hangupButton');
 // 1. Setup media sources
 
 webcamButton.onclick = async () => {
-  localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: true})
+  localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: false})
   .catch((e) => {
     console.table(e)
 
@@ -53,6 +53,7 @@ webcamButton.onclick = async () => {
 
   // Push tracks from local stream to peer connection
   localStream.getTracks().forEach((track) => {
+    if (track.kind === 'audio') track.enabled = !track.enabled;
     pc.addTrack(track, localStream);
   });
 
