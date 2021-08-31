@@ -46,7 +46,7 @@ const hangupButton = document.getElementById('hangupButton');
 webcamButton.onclick = async () => {
   // Solicita al navegador acceso a la camara y al microfono
   // configurando con este, nuestro stream de datos
-  localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: true})
+  localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: false})
   .catch((e) => {
     console.table(e)
 
