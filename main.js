@@ -44,16 +44,20 @@ const hangupButton = document.getElementById('hangupButton');
 // 1. Setup media sources
 
 webcamButton.onclick = async () => {
+  // Solicita al navegador acceso a la camara y al microfono
+  // configurando con este, nuestro stream de datos
   localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: false})
   .catch((e) => {
     console.table(e)
 
   });
+
+  // Inicialización del stream a recibir, en este momento es vacio
   remoteStream = new MediaStream();
 
   // Push tracks from local stream to peer connection
+  // Push audio/video to the peer connection (pc: RTCPeerConnection)
   localStream.getTracks().forEach((track) => {
-    if (track.kind === 'audio') track.enabled = !track.enabled;
     pc.addTrack(track, localStream);
   });
 
@@ -64,6 +68,8 @@ webcamButton.onclick = async () => {
     });
   };
 
+
+  // Asignacionn de los stream a su componente correspondiente
   webcamVideo.srcObject = localStream;
   remoteVideo.srcObject = remoteStream;
 
@@ -95,6 +101,8 @@ callButton.onclick = async () => {
     type: offerDescription.type,
   };
 
+
+  // Aqui es donde se coloca la oferta en firebase
   await callDoc.set({ offer });
 
   // Listen for remote answer
