@@ -1,7 +1,7 @@
-import './style.css';
+import "./style.css";
 
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import firebase from "firebase/app";
+import "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC6gxhINyjRetBOkPsTwuF1Jcm7veQJ02Y",
@@ -10,7 +10,7 @@ const firebaseConfig = {
   storageBucket: "pair-programming-7ea55.appspot.com",
   messagingSenderId: "864529477380",
   appId: "1:864529477380:web:d66ace4b304eee3ac02a51",
-  measurementId: "G-V7ZRHWMHPP"
+  measurementId: "G-V7ZRHWMHPP",
 };
 
 if (!firebase.apps.length) {
@@ -21,7 +21,7 @@ const firestore = firebase.firestore();
 const servers = {
   iceServers: [
     {
-      urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
+      urls: ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"],
     },
   ],
   iceCandidatePoolSize: 10,
@@ -33,24 +33,26 @@ let localStream = null;
 let remoteStream = null;
 
 // HTML elements
-const webcamButton = document.getElementById('webcamButton');
-const webcamVideo = document.getElementById('webcamVideo');
-const callButton = document.getElementById('callButton');
-const callInput = document.getElementById('callInput');
-const answerButton = document.getElementById('answerButton');
-const remoteVideo = document.getElementById('remoteVideo');
-const hangupButton = document.getElementById('hangupButton');
+const webcamButton = document.getElementById("webcamButton");
+const webcamVideo = document.getElementById("webcamVideo");
+const callButton = document.getElementById("callButton");
+const callInput = document.getElementById("callInput");
+const answerButton = document.getElementById("answerButton");
+const remoteVideo = document.getElementById("remoteVideo");
+const hangupButton = document.getElementById("hangupButton");
+const mute = document.getElementById("mute");
+const deafen = document.getElementById("deafen");
 
 // 1. Setup media sources
 
 webcamButton.onclick = async () => {
   // Solicita al navegador acceso a la camara y al microfono
   // configurando con este, nuestro stream de datos
-  localStream = await navigator.mediaDevices.getUserMedia({audio: true, video: false})
-  .catch((e) => {
-    console.table(e)
-
-  });
+  localStream = await navigator.mediaDevices
+    .getUserMedia({ audio: true, video: false })
+    .catch((e) => {
+      console.table(e);
+    });
 
   // Inicialización del stream a recibir, en este momento es vacio
   remoteStream = new MediaStream();
@@ -68,7 +70,6 @@ webcamButton.onclick = async () => {
     });
   };
 
-
   // Asignacionn de los stream a su componente correspondiente
   webcamVideo.srcObject = localStream;
   remoteVideo.srcObject = remoteStream;
@@ -81,9 +82,9 @@ webcamButton.onclick = async () => {
 // 2. Create an offer
 callButton.onclick = async () => {
   // Reference Firestore collections for signaling
-  const callDoc = firestore.collection('calls').doc();
-  const offerCandidates = callDoc.collection('offerCandidates');
-  const answerCandidates = callDoc.collection('answerCandidates');
+  const callDoc = firestore.collection("calls").doc();
+  const offerCandidates = callDoc.collection("offerCandidates");
+  const answerCandidates = callDoc.collection("answerCandidates");
 
   callInput.value = callDoc.id;
 
@@ -101,7 +102,6 @@ callButton.onclick = async () => {
     type: offerDescription.type,
   };
 
-
   // Aqui es donde se coloca la oferta en firebase
   await callDoc.set({ offer });
 
@@ -117,7 +117,7 @@ callButton.onclick = async () => {
   // When answered, add candidate to peer connection
   answerCandidates.onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
-      if (change.type === 'added') {
+      if (change.type === "added") {
         const candidate = new RTCIceCandidate(change.doc.data());
         pc.addIceCandidate(candidate);
       }
@@ -130,9 +130,9 @@ callButton.onclick = async () => {
 // 3. Answer the call with the unique ID
 answerButton.onclick = async () => {
   const callId = callInput.value;
-  const callDoc = firestore.collection('calls').doc(callId);
-  const answerCandidates = callDoc.collection('answerCandidates');
-  const offerCandidates = callDoc.collection('offerCandidates');
+  const callDoc = firestore.collection("calls").doc(callId);
+  const answerCandidates = callDoc.collection("answerCandidates");
+  const offerCandidates = callDoc.collection("offerCandidates");
 
   pc.onicecandidate = (event) => {
     event.candidate && answerCandidates.add(event.candidate.toJSON());
@@ -156,10 +156,16 @@ answerButton.onclick = async () => {
   offerCandidates.onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       console.log(change);
-      if (change.type === 'added') {
+      if (change.type === "added") {
         let data = change.doc.data();
         pc.addIceCandidate(new RTCIceCandidate(data));
       }
     });
   });
 };
+
+mute.onclick = () => {
+  mute.disabled = true;
+};
+
+deafen.onclick = () => {};
