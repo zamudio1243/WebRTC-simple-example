@@ -31,6 +31,8 @@ const servers = {
 const pc = new RTCPeerConnection(servers);
 let localStream = null;
 let remoteStream = null;
+var isMute = false;
+var isDeafen = false;
 
 // HTML elements
 const webcamButton = document.getElementById("webcamButton");
@@ -165,7 +167,21 @@ answerButton.onclick = async () => {
 };
 
 mute.onclick = () => {
-  mute.disabled = true;
+  if(isMute==false){
+    localStream.getAudioTracks()[0].enabled = false;
+    isMute = true;
+  }else{
+    localStream.getAudioTracks()[0].enabled = true;
+    isMute = false;
+  }
 };
 
-deafen.onclick = () => {};
+deafen.onclick = () => {
+  if(isDeafen==false){
+    remoteStream.getAudioTracks()[0].enabled = false;
+    isDeafen = true;
+  }else{
+    remoteStream.getAudioTracks()[0].enabled = true;
+    isDeafen = false;
+  }
+};
