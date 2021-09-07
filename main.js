@@ -179,9 +179,11 @@ mute.onclick = () => {
 deafen.onclick = () => {
   if(isDeafen==false){
     remoteStream.getAudioTracks()[0].enabled = false;
+    localStream.getAudioTracks()[0].enabled = false;
     isDeafen = true;
   }else{
     remoteStream.getAudioTracks()[0].enabled = true;
+    localStream.getAudioTracks()[0].enabled = true;
     isDeafen = false;
   }
 };
